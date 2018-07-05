@@ -256,11 +256,17 @@ type nerveMember struct {
 	Host string `json:"host"`
 	Port int    `json:"port"`
 	Name string `json:"name"`
+	Address string `json:"address"`
 }
 
 func parseNerveMember(data []byte, path string) (model.LabelSet, error) {
 	member := nerveMember{}
 	err := json.Unmarshal(data, &member)
+	
+	// 兼容spring zookeeper service discovery
+	if len(member.Host) == 0 {
+		member.Host = member.Address
+	}
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling nerve member %q: %s", path, err)
 	}
